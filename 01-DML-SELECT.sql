@@ -313,7 +313,77 @@ Select first_name, job_id, salary, Substr(job_id, 1,2),
      -- 부서코드 : 40~50->B-Group
      -- 부서코드 : 60~100 -> C-Group
      -- 나머지: Remainder
-     
+Select first_name, department_ID, department_ID as 팀,
+   case  When department_id between 10 and 30 then 'A-group'
+    When department_id  between 40 and 50 then 'B-group'
+    when department_id  between 60 and 100 then 'C-group'
+    Else 'remainder'
+    End as 팀
+from Employees;
+
+
+Select first_name ||' '|| last_name as "이름",
+salary as "월급",
+phone_number as "전화번호",
+hire_date as "입사일"
+From employees
+Order BY hire_date;
+
+Select Job_id as , salary
+From  employees
+Order by job_id desc, 
+salary Desc;
+
+Select first_name, Manager_id, commission_pct, salary
+from employees
+   Where commission_pct is null and Manager_id is not null and 
+   salary > 3000;
+   
+Select job_id, salary
+from employees
+ Where salary >= 10000
+ Order by salary desc;
+
+Select first_name, salary, NVL(commission_pct, '0')
+
+ from employees
+ where 10000<= salary and salary <14000 
+ Order by salary desc;
+ 
+ Select first_name, salary, hire_date, department_id,
+ TO_CHAR(hire_date, 'YYYY-MM-DD')
+ from employees
+ where department_id= 10 or department_id= 90 or
+ department_id= 100;
+ 
+ Select first_name, salary
+  from employees
+  Where first_name like '%S%' or first_name like '%s%';
+  
+  Select job_id
+  from employees
+  order by length(job_id) desc;
+  
+  Select country_id,State_province
+
+  case country_id when state_province is null then UPPER(country_id)
+              else country_id
+              end as 지사
+    from loactions;
+    
+
+ Select first_name, salary, Phone_number, hire_date,
+ To_char(Phone_number, '999-999-9999')
+  from employees
+  where TO-char(hire_date, 'YY/MM/DD')< TO_char(03/12/31);
+    
+  
+  
+  
+                
+ 
+
+
 
      
  
