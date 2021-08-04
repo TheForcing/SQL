@@ -90,7 +90,7 @@ from employees emp left outer join departments dept
 -- 양쪽 테이블 레코드 전부를 짝이 없어도 출력
 -- ORACLE SQL. (+) 방식으로는 불가
 Select emp.first_name, emp.department_id,
-dept.department_id, depte.department_name
+dept.department_id, dept.department_name
 from employees emp, departments dept
 Where emp.department_id=dept.department_id;
 
