@@ -1,0 +1,159 @@
+-- 문제1
+Select emp.employee_id, 
+emp.first_name,
+emp.last_name,
+dept.department_name
+From employees emp join departments dept
+    ON emp.employee_id = dept.department_id
+Order by emp.employee_id desc,dept.department_name;
+
+--문제2
+Select emp.employee_id, 
+emp.first_name,
+emp.salary,
+emp.department_id,
+emp.job_id,
+job_title
+From employees emp , Jobs jbs
+Where department_id is not null and emp.job_id= jbs.job_id;
+--문제2-1
+
+Select emp.employee_id, 
+emp.first_name,
+emp.salary,
+emp.department_id,
+emp.job_id,
+job_title
+From employees emp join Jobs 
+  On emp.Job_id=jobs.job_id
+Order by emp.employee_id;
+
+--문제3
+Select locs.Location_id,locs.country_id,dept.department_id,dept.department_name
+From locations locs , departments dept
+where  locs.location_id= dept.location_id
+order by country_id;
+
+--문제3-1
+
+Select locs.Location_id,locs.country_id,dept.department_id,dept.department_name
+From locations locs , departments dept
+where  locs.location_id= dept.location_id(+);
+
+--문제4
+
+Select rgs.Region_name, conts.country_name,rgs.region_id
+from regions rgs, countries conts
+where rgs.region_id=conts.region_id
+order by region_name, country_name Desc;
+
+--문제5
+Select emp.employee_id, 
+emp.first_name,emp.hire_date, man.first_name, man.hire_date
+from employees emp inner Join employees man
+on  emp.employee_id = man.manager_id
+where emp.hire_date>man.hire_date;
+-- 문제6
+Select countries.country_id,Country_name,
+locations.location_id,city, department_id,department_name
+from countries , locations, departments 
+where countries.country_id = locations.country_id and
+departments.location_id = locations.location_id;
+
+--문제7
+
+select first_name ||''|| last_name , 
+Job_history.Job_id,employees.employee_id, start_date, end_date
+from employees join job_history
+On Job_history.Job_id= employees.job_id and
+job_history.JOB_id like '%AC_ACCOUNT%'; 
+
+
+--문제8
+
+SELECT
+    dept.department_id,
+    dept.department_name,
+    emp.first_name,
+    loc.city,
+    ctry.country_name,
+    reg.region_name
+FROM
+    departments dept,
+    employees   emp,
+    locations   loc,
+    countries   ctry,
+    regions     reg
+WHERE
+        dept.manager_id = emp.employee_id
+    AND dept.location_id = loc.location_id
+    AND loc.country_id = ctry.country_id
+    AND ctry.region_id = reg.region_id;
+
+--문제9
+select emp.employee_id,emp.first_name,
+dept.department_name,man.first_name
+
+from employees emp , departments dept ,employees man
+
+Where  emp.employee_id = man.manager_id and emp.department_id(+)=dept.department_id;
+
+
+
+------집계 sql문제
+--문제1
+select count(manager_id)
+from employees;
+
+--문제2
+select count(salary), Max(salary),MIn(salary)
+from employees;
+select count(Salary), Max(salary),Min(salary),
+max(salary)-min(salary)
+from employees,dual;
+
+--문제3
+select To_char( Max(hire_date),'YYYY-MM-DD')
+from employees;
+
+--문제4
+select Round(avg(salary),2) , Max(salary),min(salary)
+, department_id
+from employees
+group by department_id
+order by department_id;
+
+--문제5
+select job_id, Round(Avg(salary)), Max(salary), min(Salary)
+from employees
+group by job_id
+order by min(salary) desc, avg(salary);
+
+--문제6
+select TO_char( min(hire_date), 'YYYY-MM-DD')
+from employees;
+
+--문제7
+select department_id, round(avg(salary)), min(salary), 
+round(avg(Salary)-min(salary)) as result
+from employees,dual
+group by department_id
+        having avg(salary)-min(salary)<2000
+order by result desc;
+
+--문제8
+select Job_id, Max(salary)-min(salary)as dec
+from employees,dual
+group by Job_id
+order by dec desc;
+
+--문제9
+select  round(avg(salary),1),max(salary),min(salary)
+from employees 
+where  To_char(hire_date, 'YYYY')>'2005'
+group by manager_id
+having avg(salary)>=5000
+ order by avg(salary) desc;    
+
+--문제 10 
+select 
