@@ -128,4 +128,96 @@ from employees emp JOIN employees man
   order by emp.employee_id;
   
   
+  ---------------
+  select emp.employee_id, 
+  emp.first_name,
+  emp.last_name,
+  emp.department_id,
+  dept.department_id
+  from employees emp join departments dept
+  ON emp.department_id= dept.department_id
+  order by dept.department_id Desc, emp.employee_id;
   
+  ----------------
+  -- 집계 함수
+  ------------
+  -- 여러 레코드로부터 데이터를 수집, 하나의 결과 행을 반환한다.
+  
+  -- Count 함수: 갯수 세기
+  Select count(*) From employees; -- 특정칼럼이 아닌 레코드의 갯수를 샌다
+  
+  Select count(commission_pct) from employees;-- 해당 컬럼이 null 이 아닌 갯수
+  Select count(*) From employees
+  Where commission_pct is not null;
+  
+  -- sum 함수 : 합계
+  -- 급여의 합계
+  Select Sum(salary) from employees;
+  
+  -- avg: 평균
+  --급여의 평균
+  Select avg(salary) from employees;
+  
+  -- avg 함수는 null 값은 집계에서 재외
+  
+  -- 사원들의 평균 커미션 비용
+  Select avg(commission_pct) From employees;
+  Select avg(nvl(commission_pct, 0))from employees;
+  
+  -- min/max ; 최소값, 최대값
+  Select Max(salary), Min(salary), avg(salary), Median(salary)
+  from employees;
+  
+  --일반적 오류
+  Select department_id, Avg(salary)
+  from employees; --Error
+  
+  --수정 : 집계함수
+  Select department_id, avg(salary)
+  from employees
+  Group by department_id
+  order by department_id;
+  
+  -- 집계 함수를 사용한 SELECT 문의 컬럼 목록에는
+  --Group by에 참여한 필드, 집계 함수만 올수 있다.
+  
+  -- 부서별 평균 급여를 출력,
+  -- 평균 급여가 7000 이상인 부서만 뽑아봅시다.
+  Select department_id, Avg(salary)
+  From employees
+  Where Avg(salary) >= 7000
+  Group by department_id; -- Error
+  --집계 함수 실행 이전에 Where 절을 검사하기 때문에
+  -- 집계 함수는 Where 절에서 사용할 수 없다.
+  
+  --집계 함수 실행 이후에 조건 검사하려면
+  --Having 절을 이용
+  
+  Select department_id , Round(Avg(salary),2)
+  from employees
+  Group by department_id
+     Having Avg(Salary) >= 7000
+  Order by department_id;
+  
+  -----------
+  -- 분석함수
+  ----------
+  -- ROLLUP
+  --그룹핑된 결과에 대한 상세 요약을 제공하는 기능
+  --일종의 ITEM TOTAL 기능을 수행
+  Select department_id,
+     job_id,
+     Sum(salary)
+From employees
+Group by Rollup(department_id, Job_id);
+  
+  --cube 함수
+  -- Cross table에 대한 Summary를 함꼐 추출
+  --ROLLUP함수에서 추출되는 ITEM TOTAL과 함꼐
+  -- Column TOTAL값을 함께 추출
+  select department_id, Job_Id, Sum(salary)
+  From employees
+  Group by cube(department_id,job_id)
+  Order by department_id;
+  
+   
