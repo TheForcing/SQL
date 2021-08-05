@@ -11,21 +11,22 @@ Order by emp.employee_id desc,dept.department_name;
 Select emp.employee_id, 
 emp.first_name,
 emp.salary,
-emp.department_id,
-emp.job_id,
+d.department_id,
 job_title
-From employees emp , Jobs jbs
-Where department_id is not null and emp.job_id= jbs.job_id;
+From employees emp , Jobs jbs, departments d
+Where emp.department_id =d.department_id and emp.job_id= jbs.job_id
+order by employee_id;
 --문제2-1
 
 Select emp.employee_id, 
 emp.first_name,
 emp.salary,
-emp.department_id,
-emp.job_id,
+d.department_id,
 job_title
-From employees emp join Jobs 
-  On emp.Job_id=jobs.job_id
+From employees emp left outer join departments d
+  on  emp.department_id =d.department_id
+  ,jobs j
+where emp.job_id= j.job_id
 Order by emp.employee_id;
 
 --문제3
@@ -162,3 +163,70 @@ select employee_id, salary,
         END hire_date
 from employees
 order by hire_date;
+
+
+
+-----------
+--xubquary
+----------
+-- 하나의 질의문 안에 다른 질의문을 포함하는 형태
+--전체 사원 중, 급여의 중앙값보다 많이 받는 사원
+
+--1. 급여의 중앙값?
+Select median(salary) from employees;
+
+--2.6200 보다 많이 받는 사원 쿼리
+select first_name, salary from emloyees; where salary>6200;
+
+--3. 두 쿼리를 합친다.
+select first_name, salary from employees
+where salary> (select Median(salary) from employees);
+
+-- den 보다 늦게 입사한 사람들
+--1. den 입사일 쿼리
+select hire_date from employees where first_name='den';
+-- 2. 특정 날짜 이후 입사한 살원 쿼리
+select first_name,hire_date from employees where hire_date>='02/12/07';
+--3. 두 쿼리를 합친다.
+select hire_date from employees
+where hire_date>=(where first_name='den' from employees(from employees where hire_date>='02/12/07'));
+
+--다중행 서브 쿼리
+--서브 쿼리의 결과 레코드가 둘 이상이 나올 때는 단일행 연사자를 사용할 수 없다.
+--IN,ANY,ALL EXISTS 등 집합 연산자를 활용
+select salary from employees where department_id=110;
+select first_name, salary from employees
+where salary = (select salary from employees where department_id=110); -error
+
+--결과가 다중행이면 집합연산자를 활용
+--salary= 12008 or salary= 8300
+select first_name, salary from employees
+where salary IN (select salary from employees where department_id=110); 
+
+---ALl(and)
+-- salary >12008 and salary >8300
+select first_name, salary from employees
+where salary >ALL (select salary from employees where department_id=110); 
+--ANY(OR)
+-- salary >12008 or salary >8300
+select first_name, salary from employees
+where salary >ANY (select salary from employees where department_id=110); 
+
+-- 각 부서별로 최고 급여를 받는 사원을 출력
+--1. 각 부서의 최고 급여 확인 쿼리
+select department_id, Max(Salary) from employees
+group by department_id;
+--2.  서브쿼리의 결과 (department_id, max(Salary))
+select department_id, employee_id, first_name, salary
+from employees
+where (department_id,salary) in(select department_id, Max(Salary) from employees 
+group by department_id)
+order by department_id;
+
+-- 서브쿼리와 조인
+select e.department_id, e.employee_id, e.first_name, e.salary
+from employees e, (select department_id, max(salary) salary from employees
+                      group by department_id) sal
+where e.department_id= sal.department_id and 
+ e.salary= sal.salary
+ order by e.department_id;
