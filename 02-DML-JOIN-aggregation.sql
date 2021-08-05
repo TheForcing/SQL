@@ -276,7 +276,7 @@ group by department_id;
 select department_id, employee_id, first_name, salary
 from employees
 where (department_id,salary) in(select department_id, Max(Salary) from employees 
-group by department_id)
+group by department_id
 order by department_id;
 
 -- 서브쿼리와 조인
@@ -304,7 +304,7 @@ where e.department_id= sal.department_id and
         order by salary desc)
 where rownum <=5;
 
--- 집합 연산: ㄴet
+-- 집합 연산: set
 -- union : 합집합, union all : 합집합 , 중복요소 체크 안함
 -- intersect : 교집합
 -- minus : 차집합
