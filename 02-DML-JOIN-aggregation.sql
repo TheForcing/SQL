@@ -220,4 +220,120 @@ Group by Rollup(department_id, Job_id);
   Group by cube(department_id,job_id)
   Order by department_id;
   
-   
+  
+  
+-----------
+--subquary
+----------
+-- 하나의 질의문 안에 다른 질의문을 포함하는 형태
+--전체 사원 중, 급여의 중앙값보다 많이 받는 사원
+
+--1. 급여의 중앙값?
+Select median(salary) from employees;
+
+--2.6200 보다 많이 받는 사원 쿼리
+select first_name, salary from emloyees; where salary>6200;
+
+--3. 두 쿼리를 합친다.
+select first_name, salary from employees
+where salary> (select Median(salary) from employees);
+
+-- den 보다 늦게 입사한 사람들
+--1. den 입사일 쿼리
+select hire_date from employees where first_name='den';
+-- 2. 특정 날짜 이후 입사한 살원 쿼리
+select first_name,hire_date from employees where hire_date>='02/12/07';
+--3. 두 쿼리를 합친다.
+select hire_date from employees
+where hire_date>=(where first_name='den' from employees(from employees where hire_date>='02/12/07'));
+
+--다중행 서브 쿼리
+--서브 쿼리의 결과 레코드가 둘 이상이 나올 때는 단일행 연사자를 사용할 수 없다.
+--IN,ANY,ALL EXISTS 등 집합 연산자를 활용
+select salary from employees where department_id=110;
+select first_name, salary from employees
+where salary = (select salary from employees where department_id=110); -error
+
+--결과가 다중행이면 집합연산자를 활용
+--salary= 12008 or salary= 8300
+select first_name, salary from employees
+where salary IN (select salary from employees where department_id=110); 
+
+---ALl(and)
+-- salary >12008 and salary >8300
+select first_name, salary from employees
+where salary >ALL (select salary from employees where department_id=110); 
+--ANY(OR)
+-- salary >12008 or salary >8300
+select first_name, salary from employees
+where salary >ANY (select salary from employees where department_id=110); 
+
+-- 각 부서별로 최고 급여를 받는 사원을 출력
+--1. 각 부서의 최고 급여 확인 쿼리
+select department_id, Max(Salary) from employees
+group by department_id;
+--2.  서브쿼리의 결과 (department_id, max(Salary))
+select department_id, employee_id, first_name, salary
+from employees
+where (department_id,salary) in(select department_id, Max(Salary) from employees 
+group by department_id)
+order by department_id;
+
+-- 서브쿼리와 조인
+select e.department_id, e.employee_id, e.first_name, e.salary
+from employees e, (select department_id, max(salary) salary from employees
+                      group by department_id) sal
+where e.department_id= sal.department_id and 
+ e.salary= sal.salary
+ order by e.department_id;
+ 
+ -- Correlated query
+ -- 외부쿼리와 내부쿼리가 연관관계를 맺는 쿼리
+ select e.department_id, e.employee_id, e.first_name, e.salary
+ from employees e
+ where e.salary =(select max(Salary) from employees
+                        where department_id= e.department_id)
+    order by e.department_id;
+    
+--TOP-K query
+-- rowNUM: 레코드의 순서를 가리키는 가상의 컬럼(psuedo)
+--2007년 입사자 중애서 급여 순위 5위까지 출력
+  select rownum, first_name
+  from (select * from employees
+        where hire_date like '07%'
+        order by salary desc)
+where rownum <=5;
+
+-- 집합 연산: ㄴet
+-- union : 합집합, union all : 합집합 , 중복요소 체크 안함
+-- intersect : 교집합
+-- minus : 차집합
+--05/01//01 이전 입사자 쿼리
+
+select first_name, salary, hire_date from employees where hire_date<'05/01/01';
+intersect --교집합
+select first_name, salary, hire_date from employees where >12000
+
+select first_name, salary, hire_date from employees where hire_date<'05/01/01';
+minus -- 차집합
+select first_name, salary, hire_date from employees where >12000;
+
+
+----- 순위 함수
+---- rank() : 중복 순위가 있으면 건너 뛴다, 
+-- Dense_rank(): 중복순위 상관 없이 다음 순위
+-- Row_number(): 순위 상관 없이 차례때로
+select salary, first_name,
+   rank() over (Order by salary desc) rank,
+   Dense_rank() over (order by salary desc) dense_rank,
+   Row_number() over (order by salary desc) row_number
+from employees;
+
+-- hierachical query: 계층적 쿼리
+-- tree 형태의 구조 추출
+-- level 가상 컬럼
+select level, employee_id, first_name, manager_id
+from employees
+start with manager_id is null -- 트리 시작 조건
+connect by prior employee_id = manager_id
+order by level;
