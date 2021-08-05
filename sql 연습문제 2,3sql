@@ -108,9 +108,7 @@ from employees;
 --문제2
 select count(salary), Max(salary),MIn(salary)
 from employees;
-select count(Salary), Max(salary),Min(salary),
-max(salary)-min(salary)
-from employees,dual;
+
 
 --문제3
 select To_char( Max(hire_date),'YYYY-MM-DD')
@@ -156,4 +154,11 @@ having avg(salary)>=5000
  order by avg(salary) desc;    
 
 --문제 10 
-select 
+select employee_id, salary,
+  case when hire_date <= '02/12/31' then '창립멤버'
+        when hire_date <= '03/12/31' then '03년입사'
+        when hire_date <= '04/12/31' then '04년 입사'
+        else '상장이후 입사'
+        END hire_date
+from employees
+order by hire_date;
