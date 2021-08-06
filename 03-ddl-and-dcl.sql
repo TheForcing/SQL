@@ -1,131 +1,135 @@
-------------
------dcl
-----------------
+----------
+-- DCL
+----------
+-- CREATE : 데이터베이스 객체 생성
+-- ALTER : 데이터베이스 객체 수정
+-- DROP : 데이터베이스 객체 삭제
 
--- create : 데이터베이스 객체 생성
--- alter: 데이터베이스 객체 수정
- -- drop : 데이터베이스 객체 삭제
- 
- 
- --system 계정으로 수행
- 
- -- 사용자 생성: create user
- create user c##bituser identified by bituser;
- 
- --sql plust 에서 사용자 접속
- -- 사용자 삭제 : drop user
- Drop user c##bituser cascade; -- CASCADE 연결된 모든 것을 함께 삭제
- 
- --다시 생성
- create user c##bituser identified by bituser;
- 
- 
- --사용자 정보 확인
- -- user_: 현재 사용자 관련
- -- ALL_: 전체의 객체
- -- DBA_: DBA전용 , 객체의 모든 정보
- select* from User_users;
- select* from all_users;
- select* from DBA_users;
- 
- --새로 만든 사용자 확인
- select* from DBA_USERS Where Username='c##bituser';
- 
- --권한(privilege)과 역할(ROLO)
- --특정 작업 수행을 위해 적절한 권한을 가져야 한다.
- -- Create SESSION
- 
- -- 시스템 권한의 부여: GRANT 권한 TO 사용자
- -- C##bituser에게 create session 권한을 부여
- GRANT create session To c##bituser;
- 
- -- 일반적으로 connect, resource 롤을 부여하면 일반사용자의 역할 수행 가능
- GRANT connect, resource TO c##bituser
- 
- -- ORECLE 12이후로부터는 임의로 tablespace 를 할당 해줘야 한다
- ALTER user c##bituser  --사용자 정보 수정
- default tablespace users --기본테이블 스페이스를  users에 저장
-  QUOTA unlimited on users; --사용 용량 지정
-  
-  
+-- System 계정으로 수행
+
+-- 사용자 생성: CREATE USER
+CREATE USER c##bituser IDENTIFIED BY bituser;
+
+-- SQLPLUS에서 사용자로 접속
+-- 사용자 삭제: DROP USER
+DROP USER c##bituser CASCADE;  --  CASCADE 연결된 모든 것을 함께 삭제
+
+-- 다시 생성
+CREATE USER c##bituser IDENTIFIED BY bituser;
+
+-- 사용자 정보 확인
+-- USER_ : 현재 사용자 관련
+-- ALL_ : 전체의 객체
+-- DBA_ : DBA 전용, 객체의 모든 정보
+SELECT * FROM USER_USERS;
+SELECT * FROM ALL_USERS;
+SELECT * FROM DBA_USERS;
+
+-- 새로 만든 사용자 확인 
+SELECT * FROM DBA_USERS WHERE username = 'C##BITUSER';
+
+-- 권한(Privilege)과 역할(ROLE)
+-- 특정 작업 수행을 위해 적절한 권한을 가져야 한다.
+-- CREATE SESSION
+
+-- 시스템 권한의 부여: GRANT 권한 TO 사용자
+-- C##BITUSER에게 create session 권한을 부여
+GRANT create session TO C##BITUSER;
+
+-- 일반적으로 CONNECT, RESOURCE 롤을 부여하면 일반사용자의 역할 수행 가능
+GRANT connect, resource TO C##BITUSER;
+
+-- Oracle 12 이후로는 임의로 TABLESPACE를 할당 해 줘야 한다.
+ALTER USER C##BITUSER           -- 사용자 정보 수정
+    DEFAULT TABLESPACE USERS    -- 기본 테이블 스페이스를 USERS 에 지정
+    QUOTA UNLIMITED ON USERS;   --  사용 용량 지정
+    
 -- 객체 권한 부여
--- C##BITUSER 사용자에게 HR.EMPLOYEES를 select 할 수 있는 권한 부여
-GRANT select On HR.EMPLOYEES to C##BITUSER;
+-- C##BITUSER 사용자에게 HR.EMPLOYEES를 SELECT 할 수 있는 권한 부여
+GRANT select ON HR.EMPLOYEES TO C##BITUSER;
 -- 객체 권한 회수
-REVOKE select on Hr.EMPLOYEES from c##bituser;
-Grant select ON HR.EMPLOYEES to c##bituser;
--- 전체 권한 부여시
--- GRANT ALL PRIVILEGES....
+REVOKE select ON HR.EMPLOYEES FROM C##BITUSER;
+GRANT select ON HR.EMPLOYEES TO C##BITUSER;
+-- 전체 권한 부여시 
+-- GRANT all privileges ...
 
-create user c##bituser identified by bituser;
+---------
+-- DDL
+---------
+-- 이후 C##BITUSER로 진행
 
------------
--- ddl
------------
--- 이후 C##bituser로 진행
+-- 현재 내가 소유한 테이블 목록 확인
+SELECT * FROM tab;
+-- 현재 나에게 주어진 ROLE을 조회
+SELECT * FROM USER_ROLE_PRIVS;
 
---현재 내가 소유한 테이블 목록 확인
-select*from tab;
--- 현재 나에게 주어진 role을 조회
-select*from User_role_privs;
-
---create table: 테이블 생성
-create table book (
-     book_id number(5),
-     title varchar2(50),
-     author varchar2(10),
-     pub_data Date default sysdate
+-- CREATE TABLE: 테이블 생성
+CREATE TABLE book (
+    book_id NUMBER(5),
+    title VARCHAR2(50),
+    author VARCHAR2(10),
+    pub_date DATE DEFAULT SYSDATE
 );
 
-select*from tab;
-desc book;
---서브쿼리를 이용한 테이블 생성
---hr스키마의 employees 테이블의 일부 데이터를 추출, 새 테이블 생성
+SELECT * FROM tab;
+DESC book;  
 
-select * from hr.employees;
+-- 서브쿼리를 이용한 테이블 생성
+-- HR스키마의 employees 테이블의 일부 데이터를 추출, 새 테이블 생성
+SELECT * FROM HR.employees;
 
--- job_id 가 IT_관련 직원들만 뽑아내어 새 테이블 생성
+-- job_id가 IT_ 관련 직원들만 뽑아내어 새 테이블 생성
+CREATE TABLE it_emps AS (
+    SELECT * FROM hr.employees
+    WHERE job_id LIKE 'IT_%'
+);
 
-create Table It_emps as(
- select*from hr.employees
- where job_id like 'IT_$'
- );
- 
- desc IT_EMPS;
- 
- -- author 테이블 추가
- create table author (
-   author_id number(10),
-   author_name varchar(50) not null,
-   autohr_desc varchar2(500),
-   primary key (author_id) -- 테이블 제약
-   );
-   
-   desc author;
-   
-   ---- book 테이블의 author 컬럼 지우기
-   ---나중에 author 테이블과 fk 연결
-Desc book;
-alter table book drop column author;
+DESC IT_EMPS;
+SELECT * FROM IT_EMPS;
 
---- author 테이블 참조를 위한 컬럼 author_id 추가
-alter table book 
-add (author_id number(10));
- 
---book 테이블의 book_id도 number (10)으로 변경
+DROP TABLE IT_EMPS; -- 삭제
 
-Alter table book modify (Book_id number(10));
+-- author 테이블 추가
+CREATE TABLE author (
+    author_id NUMBER(10),
+    author_name VARCHAR2(50) NOT NULL,
+    author_desc VARCHAR2(500),
+    PRIMARY KEY (author_id) --   테이블 제약
+);
+DESC author;
 
-desc book;
+-- book 테이블의 author 컬럼 지우기
+-- 나중에 author 테이블과 FK 연결
+DESC book;
+ALTER TABLE book DROP COLUMN author;
 
-desc author;
+-- author 테이블 참조를 위한 컬럼 author_id 추가
+ALTER TABLE book 
+ADD (author_id NUMBER(10));
 
---- book.book_id에 pk제약조건 부여
-Alter table book
-Add CONSTRAINT pk_book_id primary key (book_id);
+-- book 테이블의 book_id도 NUMBER(10)으로 변경
+ALTER TABLE book
+MODIFY (book_id NUMBER(10));
 
---book.author_id를 Author.author_id를 참조하도록 제약
-Alter table book
-Add constRaint fk_author_id Foreign key (author_id)
-                            references author(author_id)
-                            on delete cascade;
+DESC book;
+DESC author;
+
+-- book.book_id에 PK 제약조건 부여
+ALTER TABLE book
+ADD CONSTRAINT pk_book_id PRIMARY KEY (book_id);
+
+-- book.author_id를 author.author_id를 참조하도록 제약
+ALTER TABLE book
+ADD CONSTRAINT fk_author_id FOREIGN KEY (author_id)
+                            REFERENCES author(author_id)
+                            ON DELETE CASCADE;
+                            
+---Data dictionary
+---전체 데이터 딕셔너리 확인
+Select * from dictionary;
+
+--사용자의 스키마 객체 확인 : USER_OBJECTS
+select * From USER_OBJECTS;
+
+--제약조건의 확인 : user_constratints
+select* from User_CONSTRAINTS;
