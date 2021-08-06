@@ -254,5 +254,44 @@ WHERE
     AND e.salary > t.salary;
     
 --문제8
-select hore
+--쿼리1
+select RowNUM employee_id, 
+       frist_name
+       salary
+       hire_date
+from employees
+order by hire_date asc;
 
+--쿼리2
+select ROWNUM rn,
+       employee_id,
+       first_name,
+       salary,
+       hire_date
+from (select 
+       employee_id, 
+       first_name,
+       salary,
+       hire_date
+       from employees 
+       order by hire_date asc);
+--최종 쿼리
+select rn,
+       employee_id,
+       first_name,
+       salary,
+       hire_date
+from (select ROWNUM rn,
+       employee_id,
+       first_name,
+       salary,
+       hire_date
+from (select 
+       employee_id, 
+       first_name,
+       salary,
+       hire_date
+       from employees 
+       order by hire_date asc)
+       )
+where rn between 11 and 15;
