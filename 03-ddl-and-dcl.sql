@@ -111,11 +111,21 @@ alter table book drop column author;
 --- author 테이블 참조를 위한 컬럼 author_id 추가
 alter table book 
 add (author_id number(10));
-
+ 
 --book 테이블의 book_id도 number (10)으로 변경
 
 Alter table book modify (Book_id number(10));
 
 desc book;
 
- 
+desc author;
+
+--- book.book_id에 pk제약조건 부여
+Alter table book
+Add CONSTRAINT pk_book_id primary key (book_id);
+
+--book.author_id를 Author.author_id를 참조하도록 제약
+Alter table book
+Add constRaint fk_author_id Foreign key (author_id)
+                            references author(author_id)
+                            on delete cascade;
