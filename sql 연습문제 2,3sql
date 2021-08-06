@@ -183,6 +183,11 @@ group by employee_id, salary, first_name
 from employees)
 order by salary;
 
+select e.employee_id, e.first_name, e.salary ,t.avgsalary, t.maxsalary
+from employees e, (select avg(salary) avgsalary, max(Salary) maxsalary from employees)t
+where e.salary between t.avgsalary and t.maxsalary
+group by salary;
+
 --문제3
 Select l.location_id,l.street_address, l.postal_code, l.city,l.state_province,
 l.country_ID, first_name ||''|| Last_name
@@ -204,8 +209,50 @@ e.salary= sal.salary
 order by salary desc;
 
 select e.employee_id , e.first_name, e.salary,e.department_id
-from employees e, departments d
-where department_id= (select department_id, max(salary) from eployees where e.salary=max(Salary)
-group by department_id); 
+from employees e
+where (department_id,salary) IN(select department_id, max(salary) from eployees 
+group by department_id)
+order by salary desc;
 
+
+--문제6
+--쿼리1
+select job_id, sum(salary) sumsalary
+from employees e
+group by job_id;
+
+--최종커리
+select j.job_title, 
+    t.sumsalary
+from jobs j, (select job_id,
+              sum(salary) sumsalary
+              from employees e group by job_id)t
+where j.job_id= t.job_id;
+
+--문제7
+--쿼리1 부서별 평균 급여
+select department_id, avg(Salary) salary
+from employees group by department_id;
+-- 최종쿼리
+SELECT
+    e.employee_id,
+    e.first_name,
+    e.salary
+FROM
+    employees e,
+    (
+        SELECT
+            department_id,
+            AVG(salary) salary
+        FROM
+            employees
+        GROUP BY
+            department_id
+    )         t
+WHERE
+        e.department_id = t.department_id
+    AND e.salary > t.salary;
+    
+--문제8
+select hore
 
