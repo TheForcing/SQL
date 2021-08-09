@@ -128,4 +128,15 @@ select*from user_SEQUENCECS;
 select*from user_objects
 where object_type='sequence';
 
+--시퀀스 삭제
+Drop SEQUENCE my_seq;
+Select*From User_SEQUENCEl
+
+---boook.book_id를 위한 시퀀스 생성
+Select Max(Book_id) From book;
+Create SEQUENCE seq_book_id
+   start with 3
+   IncreMent by 1;
+Select*from user_SEQUENCES;
+
 
