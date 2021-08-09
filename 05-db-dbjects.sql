@@ -78,3 +78,54 @@ select*from user_objects;
 
 select object_name, object_type, status from user_objects
 where object_type='view';
+
+
+----- INDEX:검색 속도증가
+--Insert , update, delete -> 인덱스의 갱싱 발생
+--Hr.employess 테이블 복사->s_emp 테이블 생성
+Create table s_emp
+   As select*from HR.employees;
+   
+select*from S_emp;
+--s_emp.employee_id에 Unique_index 부여
+Create Unique Index s_emp_id
+    on S_emp(employee_id);
+-- Index 위한 dictionary
+Select*from user_indexes;
+Select*from user_ind_columns;
+----인덱스 삭제
+drop index s_emp_id;
+Select*from user_indexes;
+--인덱스는 테이블과 독립적: 인덱스 삭제해도 테이블 데이터는 남아있다.
+
+    ---- SQUENCE
+    --시퀀스 생성, 안젆하게 중복처리
+    ROLLBACK;
+    
+    select Max(author_id) from author;
+    create sequence seq_author_id
+       start with 3
+      INCREMENT by
+      Maxvalue 1000000;
+      
+Insert Into author( author_id, author_name)
+values(seq_author_id.maxtval)
+
+select*from autohr;
+
+--새 시퀀스 만들기
+CREATE SEQUENCE my_seq
+   start with 1
+   INCREMENT 2
+   MAXVALUE 10;
+   
+   --수도 컬럼 : CURRVAL(현재 시퀀스 값), NEXTVAL(값을 증가 새값)
+select my_seq.NextVAL FROM dual;
+select my_seq.CURRVAL FROm dual;
+
+-- SEQUENCE를 위한 DICTIONARY
+select*from user_SEQUENCECS;
+select*from user_objects
+where object_type='sequence';
+
+
